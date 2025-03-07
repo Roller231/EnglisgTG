@@ -1,4 +1,9 @@
 <?php
+
+header("Access-Control-Allow-Origin: *"); 
+header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
+header("Access-Control-Allow-Headers: Content-Type, Authorization");
+
 $host = "lelyim7e.beget.tech"; // или другой адрес сервера MySQL
 $dbname = "lelyim7e_nixzord";
 $user = "lelyim7e_nixzord";

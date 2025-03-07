@@ -126,7 +126,7 @@ public class LevelLoader : MonoBehaviour
                 parentRect.offsetMax = new Vector2(parentRect.offsetMax.x, parentRect.offsetMax.y + 680);
             }
         }
-        GameObject newObjStart = Instantiate(prefabLevelStart, parentObjectLevel);
+        //GameObject newObjStart = Instantiate(prefabLevelStart, parentObjectLevel);
         parentRect.offsetMax = new Vector2(parentRect.offsetMax.x, parentRect.offsetMax.y + 680);
 
 
