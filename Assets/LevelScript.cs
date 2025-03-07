@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -17,6 +18,15 @@ public class LevelScript : MonoBehaviour
     public Color color;
     public List<Image> imagesPoints;
     public Image imageButton;
+    public int type_level;
+
+    [Header("Text Elements")]
+    public TextMeshProUGUI number_level_text;
+
+    //private void OnEnable()
+    //{
+    //    number_level_text.text = id.ToString();
+    //}
 
     public void SetColor(Color color)
     {

@@ -19,6 +19,8 @@ public class LevelLoader : MonoBehaviour
 
     [Header("For create level")]
     public GameObject prefabLevel;  // Префаб объекта
+    public GameObject prefabLevelEnd;  // Префаб объекта
+    public GameObject prefabLevelStart;  // Префаб объекта
     public Transform parentObjectLevel; // Родительский объект
     public Color[] levelColors; // Массив цветов для уровней
 
@@ -72,6 +74,7 @@ public class LevelLoader : MonoBehaviour
             word5en = level.word5en;
             word5ru = level.word5ru;
 
+
             Debug.Log($"Текущий уровень {id}: {word1en} - {word1ru}");
         }
         else
@@ -84,6 +87,10 @@ public class LevelLoader : MonoBehaviour
     {
         RectTransform parentRect = parentObjectLevel.GetComponent<RectTransform>();
 
+        GameObject newObjEnd = Instantiate(prefabLevelEnd, parentObjectLevel);
+        parentRect.offsetMax = new Vector2(parentRect.offsetMax.x, parentRect.offsetMax.y + 680);
+
+
         for (int i = levels.Count - 1; i >= 0; i--) // Начинаем с конца списка
         {
             LevelData level = levels[i];
@@ -93,6 +100,7 @@ public class LevelLoader : MonoBehaviour
 
             // Передаем данные в LevelScript
             levelScript.id = level.id;
+            levelScript.number_level_text.text = level.id.ToString();
             levelScript.word1en = level.word1en;
             levelScript.word1ru = level.word1ru;
             levelScript.word2en = level.word2en;
@@ -103,20 +111,25 @@ public class LevelLoader : MonoBehaviour
             levelScript.word4ru = level.word4ru;
             levelScript.word5en = level.word5en;
             levelScript.word5ru = level.word5ru;
+            levelScript.type_level = level.type_level;
 
             // Выбираем случайный цвет и применяем его
             if (levelColors.Length > 0)
             {
-                Color randomColor = levelColors[Random.Range(0, levelColors.Length)];
+                Color randomColor = levelColors[levelScript.type_level];
                 levelScript.SetColor(randomColor);
             }
 
             // Увеличиваем параметр Top у родителя
             if (parentRect != null)
             {
-                parentRect.offsetMax = new Vector2(parentRect.offsetMax.x, parentRect.offsetMax.y + 580);
+                parentRect.offsetMax = new Vector2(parentRect.offsetMax.x, parentRect.offsetMax.y + 680);
             }
         }
+        GameObject newObjStart = Instantiate(prefabLevelStart, parentObjectLevel);
+        parentRect.offsetMax = new Vector2(parentRect.offsetMax.x, parentRect.offsetMax.y + 680);
+
+
     }
 
 
@@ -136,6 +149,7 @@ public class LevelData
     public string word4ru;
     public string word5en;
     public string word5ru;
+    public int type_level;
 }
 
 // Вспомогательный класс для десериализации JSON-массива
