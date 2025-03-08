@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using TMPro;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UI;
@@ -19,15 +20,32 @@ public class GameManager : MonoBehaviour
     public int health;
     public int levelOpened;
 
+    [HideInInspector]
+    public string photo_url_profile;
+
+
+    [Header("Main UI")]
+    [SerializeField] private TextMeshProUGUI streakCount;
+    [SerializeField] private TextMeshProUGUI moneyCount;
+    [SerializeField] private TextMeshProUGUI healthCount;
+
     public bool isInitialized { get; private set; } = false;
+
+    private void Update()
+    {
+        streakCount.text = streak.ToString();
+        moneyCount.text = money.ToString();
+        healthCount.text = health.ToString();
+    }
 
     private void Awake()
     {
         TelegramWebApp.Ready();
         userID = GetUserIdFromInitData(TelegramWebApp.InitData).ToString();
-        username = GetUsernameFromInitData(TelegramWebApp.InitData);
+        username = GetUsernameFromInitData(JsonUtility.ToJson(TelegramWebApp.InitDataUnsafe));
+        photo_url_profile = GetIconFromInitData(JsonUtility.ToJson(TelegramWebApp.InitDataUnsafe));
 
-        idText.text = TelegramWebApp.InitData;
+        idText.text = JsonUtility.ToJson(TelegramWebApp.InitDataUnsafe);
 
         Debug.Log($"UserID: {userID}, Username: {username}");
 
@@ -65,14 +83,8 @@ public class GameManager : MonoBehaviour
     {
         try
         {
-            string decodedData = Uri.UnescapeDataString(initData);
-            int usernameKeyIndex = decodedData.IndexOf("\"username\":\"") + 11;
-            if (usernameKeyIndex == 10) return "Unknown"; // Если не найдено, возвращаем дефолт
-
-            int usernameEndIndex = decodedData.IndexOf("\"", usernameKeyIndex);
-            if (usernameEndIndex == -1) return "Unknown";
-
-            return decodedData.Substring(usernameKeyIndex, usernameEndIndex - usernameKeyIndex);
+            TelegramInitData data = JsonUtility.FromJson<TelegramInitData>(initData);
+            return !string.IsNullOrEmpty(data.user.username) ? data.user.username : "Unknown";
         }
         catch (Exception ex)
         {
@@ -80,6 +92,41 @@ public class GameManager : MonoBehaviour
             return "Unknown";
         }
     }
+
+    public string GetIconFromInitData(string initData)
+    {
+        try
+        {
+            TelegramInitData data = JsonUtility.FromJson<TelegramInitData>(initData);
+            return !string.IsNullOrEmpty(data.user.photo_url) ? data.user.username : "Unknown";
+        }
+        catch (Exception ex)
+        {
+            Debug.Log($"Error extracting Username: {ex.Message}");
+            return "Unknown";
+        }
+    }
+
+    // Классы для десериализации JSON
+    [Serializable]
+    public class TelegramInitData
+    {
+        public TelegramUser user;
+    }
+
+    [Serializable]
+    public class TelegramUser
+    {
+        public long id;
+        public bool is_bot;
+        public string first_name;
+        public string last_name;
+        public string username;
+        public string language_code;
+        public string photo_url;
+
+    }
+
 
 
     private IEnumerator InitializeUser()
@@ -168,6 +215,9 @@ public class GameManager : MonoBehaviour
                     money = response.data.money;
                     health = response.data.health;
                     levelOpened = response.data.levelOpened;
+
+
+
 
                     isInitialized = true;
                 }
