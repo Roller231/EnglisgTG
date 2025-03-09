@@ -2,11 +2,14 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
+using UTeleApp.Demo;
 
 public class LevelLoader : MonoBehaviour
 {
     private string url = "https://nixzord.online/api/get_levels.php";
     public static List<LevelData> levels = new List<LevelData>(); // Список всех уровней
+
+    public  List<LevelScript> levelsObj = new List<LevelScript>(); // Список всех уровней
 
     // Публичные переменные для хранения данных о текущем уровне
     [Header("Info from JSON")]
@@ -24,9 +27,17 @@ public class LevelLoader : MonoBehaviour
     public Transform parentObjectLevel; // Родительский объект
     public Color[] levelColors; // Массив цветов для уровней
 
+    [Header("GameManager")]
+    private GameManager gameManager;
+
+
+
     void Start()
     {
+        gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
+
         StartCoroutine(GetLevels());
+
     }
 
     IEnumerator GetLevels()
@@ -39,6 +50,7 @@ public class LevelLoader : MonoBehaviour
             Debug.Log("Данные успешно получены!");
             SaveLevels(request.downloadHandler.text);
             CreateLevels(); // Создаем уровни после загрузки данных
+            LoadLockLevels();
         }
         else
         {
@@ -90,13 +102,13 @@ public class LevelLoader : MonoBehaviour
         GameObject newObjEnd = Instantiate(prefabLevelEnd, parentObjectLevel);
         parentRect.offsetMax = new Vector2(parentRect.offsetMax.x, parentRect.offsetMax.y + 680);
 
-
         for (int i = levels.Count - 1; i >= 0; i--) // Начинаем с конца списка
         {
             LevelData level = levels[i];
 
             GameObject newObj = Instantiate(prefabLevel, parentObjectLevel);
             LevelScript levelScript = newObj.GetComponent<LevelScript>();
+            levelsObj.Add(newObj.GetComponent<LevelScript>());
 
             // Передаем данные в LevelScript
             levelScript.id = level.id;
@@ -112,6 +124,7 @@ public class LevelLoader : MonoBehaviour
             levelScript.word5en = level.word5en;
             levelScript.word5ru = level.word5ru;
             levelScript.type_level = level.type_level;
+            levelScript.SetWasWin(level.WasWin); // Передаем значение WasWin
 
             // Выбираем случайный цвет и применяем его
             if (levelColors.Length > 0)
@@ -126,11 +139,38 @@ public class LevelLoader : MonoBehaviour
                 parentRect.offsetMax = new Vector2(parentRect.offsetMax.x, parentRect.offsetMax.y + 680);
             }
         }
-        //GameObject newObjStart = Instantiate(prefabLevelStart, parentObjectLevel);
+
         parentRect.offsetMax = new Vector2(parentRect.offsetMax.x, parentRect.offsetMax.y + 680);
-
-
     }
+
+
+    public void LoadLockLevels()
+    {
+        int count = levelsObj.Count;
+        for (int i = count - 1; i >= count - gameManager.levelOpened; i--)
+        {
+            levelsObj[i].Unlock();
+            Debug.Log(levelsObj[i]);
+        }
+    }
+
+
+
+    //// Метод для обновления статуса WasWin
+    //public IEnumerator UpdateLevelWinStatus(int levelId, int wasWin)
+    //{
+
+
+
+    //    string updateLevelWinUrl = "https://nixzord.online/api/update_level_win.php";
+    //    WWWForm form = new WWWForm();
+    //    form.AddField("id", levelId);
+    //    form.AddField("WasWin", wasWin);
+
+    //    UnityWebRequest request = UnityWebRequest.Post(updateLevelWinUrl, form);
+    //    yield return request.SendWebRequest();
+
+    //}
 
 
 }
@@ -150,6 +190,7 @@ public class LevelData
     public string word5en;
     public string word5ru;
     public int type_level;
+    public int WasWin; // Новое поле
 }
 
 // Вспомогательный класс для десериализации JSON-массива

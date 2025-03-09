@@ -21,7 +21,7 @@ $username = $_POST["username"]; // Здесь можно заменить на �
 
 try {
     $stmt = $pdo->prepare("INSERT INTO users (id, username, regdate, streak, money, health, levelOpened) 
-                           VALUES (:id, :username, NOW(), 0, 0, 0, 1)");
+                           VALUES (:id, :username, NOW(), 0, 0, 3, 1)");
     $stmt->bindParam(":id", $id);
     $stmt->bindParam(":username", $username);
     $stmt->execute();

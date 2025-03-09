@@ -226,11 +226,11 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    public IEnumerator UpdateUserData(string id, string username, int streak, int money, int health, int levelOpened)
+    public IEnumerator UpdateUserData( int streak, int money, int health, int levelOpened)
     {
         string url = baseUrl + "update_user_data.php";
         WWWForm form = new WWWForm();
-        form.AddField("id", id);
+        form.AddField("id", userID);
         form.AddField("username", username);
         form.AddField("streak", streak);
         form.AddField("money", money);
@@ -239,6 +239,19 @@ public class GameManager : MonoBehaviour
 
         UnityWebRequest request = UnityWebRequest.Post(url, form);
         yield return request.SendWebRequest();
+    }
+
+    public void incorrectUnswer()
+    {
+        health--;
+        StartCoroutine(UpdateUserData(streak, money, health, levelOpened));
+    }
+
+    public void WinInLevel(int money)
+    {
+        this.money += money;
+        StartCoroutine(UpdateUserData(streak, this.money, health, levelOpened));
+
     }
 
     [Serializable]
