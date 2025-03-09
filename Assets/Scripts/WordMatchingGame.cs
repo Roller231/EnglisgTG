@@ -19,7 +19,7 @@ public class WordMatchingGame : MonoBehaviour
     private string selectedWord; // Выбранное слово
     private int selectedButtonIndex; // Индекс выбранной кнопки
 
-    public int idLevel;
+    public LevelScript idLevel;
 
     private GameManager gameManager;
 
@@ -148,10 +148,16 @@ public class WordMatchingGame : MonoBehaviour
         level1.GetComponent<Animation>().Play("close");
 
 
+        if(idLevel.id == gameManager.levelOpened)
+        {
+            gameManager.levelOpened++;
+
             gameManager.WinInLevel(50);
+        }
 
 
-        
+
+
 
 
         RestartGame();

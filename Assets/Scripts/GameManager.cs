@@ -19,6 +19,8 @@ public class GameManager : MonoBehaviour
     public int money;
     public int health;
     public int levelOpened;
+    public string lastLogin; // Дата последнего захода
+    public string lastStreakUpdate;
 
     [HideInInspector]
     public string photo_url_profile;
@@ -215,10 +217,10 @@ public class GameManager : MonoBehaviour
                     money = response.data.money;
                     health = response.data.health;
                     levelOpened = response.data.levelOpened;
+                    lastLogin = response.data.last_login;
+                    lastStreakUpdate = response.data.lastStreakUpdate;
 
-
-
-
+                    CheckAndRestoreHealth();
                     isInitialized = true;
                 }
             }
@@ -226,7 +228,70 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    public IEnumerator UpdateUserData( int streak, int money, int health, int levelOpened)
+    private void CheckAndRestoreHealth()
+    {
+        DateTime lastLoginTime;
+        DateTime lastStreakUpdateTime;
+
+        // Парсим даты
+        bool hasLastLogin = DateTime.TryParse(lastLogin, out lastLoginTime);
+        bool hasLastStreakUpdate = DateTime.TryParse(lastStreakUpdate, out lastStreakUpdateTime);
+
+        // Восстановление здоровья
+        if (hasLastLogin)
+        {
+            TimeSpan timeSinceLastLogin = DateTime.UtcNow - lastLoginTime;
+            int hoursPassed = (int)timeSinceLastLogin.TotalHours;
+
+            if (hoursPassed > 0 && health < 3)
+            {
+                health = Math.Min(3, health + hoursPassed);
+            }
+        }
+
+        // Обновление серии
+        if (hasLastStreakUpdate)
+        {
+            // Получаем текущую дату и дату последнего обновления серии
+            DateTime currentDate = DateTime.UtcNow.Date; // Текущая дата (без времени)
+            DateTime lastStreakUpdateDate = lastStreakUpdateTime.Date; // Дата последнего обновления серии (без времени)
+
+            // Вычисляем разницу в днях
+            int daysPassed = (currentDate - lastStreakUpdateDate).Days;
+
+            if (daysPassed == 1)
+            {
+                // Игрок зашел на следующий день — увеличиваем серию
+                Debug.LogWarning("NEXT DAYYY");
+                streak++;
+            }
+            else if (daysPassed >= 2)
+            {
+                // Игрок пропустил день — обнуляем серию
+                Debug.LogWarning("SKIPPP DAYYY");
+
+                streak = 0;
+            }
+            else
+            {
+            }
+
+            // Обновляем дату последнего обновления серии
+            lastStreakUpdate = DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss");
+        }
+        else
+        {
+            Debug.LogWarning("ELSE DAYYY");
+
+            // Если поле lastStreakUpdate пустое, инициализируем его
+            lastStreakUpdate = DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss");
+        }
+
+        // Сохраняем обновленные данные
+        StartCoroutine(UpdateUserData(streak, money, health, levelOpened));
+    }
+
+    public IEnumerator UpdateUserData(int streak, int money, int health, int levelOpened)
     {
         string url = baseUrl + "update_user_data.php";
         WWWForm form = new WWWForm();
@@ -236,6 +301,8 @@ public class GameManager : MonoBehaviour
         form.AddField("money", money);
         form.AddField("health", health);
         form.AddField("levelOpened", levelOpened);
+        form.AddField("last_login", DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss"));
+        form.AddField("lastStreakUpdate", lastStreakUpdate); // Новое поле
 
         UnityWebRequest request = UnityWebRequest.Post(url, form);
         yield return request.SendWebRequest();
@@ -250,6 +317,7 @@ public class GameManager : MonoBehaviour
     public void WinInLevel(int money)
     {
         this.money += money;
+        gameObject.GetComponent<LevelLoader>().LoadLockLevels();
         StartCoroutine(UpdateUserData(streak, this.money, health, levelOpened));
 
     }
@@ -270,5 +338,7 @@ public class GameManager : MonoBehaviour
         public int money;
         public int health;
         public int levelOpened;
+        public string last_login;
+        public string lastStreakUpdate; // Новое поле
     }
 }

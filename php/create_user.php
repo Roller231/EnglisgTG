@@ -20,8 +20,9 @@ $id = $_POST["id"];
 $username = $_POST["username"]; // Здесь можно заменить на то значение, которое вам нужно
 
 try {
-    $stmt = $pdo->prepare("INSERT INTO users (id, username, regdate, streak, money, health, levelOpened) 
-                           VALUES (:id, :username, NOW(), 0, 0, 3, 1)");
+    // Исправленный SQL-запрос с добавлением lastStreakUpdate
+    $stmt = $pdo->prepare("INSERT INTO users (id, username, regdate, streak, money, health, levelOpened, last_login, lastStreakUpdate) 
+                           VALUES (:id, :username, NOW(), 1, 500, 3, 1, NOW(), NOW())");
     $stmt->bindParam(":id", $id);
     $stmt->bindParam(":username", $username);
     $stmt->execute();

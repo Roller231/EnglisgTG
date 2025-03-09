@@ -14,7 +14,6 @@ public class LevelScript : MonoBehaviour
     public string word4en, word4ru;
     public string word5en, word5ru;
     public int type_level;
-    public int WasWin; // Новое поле
 
     [Header("Color on  create")]
     public Color color;
@@ -42,10 +41,7 @@ public class LevelScript : MonoBehaviour
         imageButton.gameObject.GetComponent<Button>().onClick.AddListener(() => StartLevel());
     }
 
-    public void SetWasWin(int wasWin)
-    {
-        this.WasWin = wasWin;
-    }
+
     public void SetColor(Color color)
     {
         this.color = color;
@@ -86,7 +82,9 @@ public class LevelScript : MonoBehaviour
             GameObject level1 = GameObject.Find("LevelType1");
             WordMatchingGame wordMatchingGame = level1.GetComponent<WordMatchingGame>();
 
-            wordMatchingGame.idLevel = id;
+            wordMatchingGame.idLevel = gameObject.GetComponent<LevelScript>();
+
+            
 
             // Закрываем нижнюю панель и открываем уровень
             GameObject.Find("MainBottomPanel").GetComponent<Animation>().Play("close");

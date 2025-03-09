@@ -124,7 +124,6 @@ public class LevelLoader : MonoBehaviour
             levelScript.word5en = level.word5en;
             levelScript.word5ru = level.word5ru;
             levelScript.type_level = level.type_level;
-            levelScript.SetWasWin(level.WasWin); // Передаем значение WasWin
 
             // Выбираем случайный цвет и применяем его
             if (levelColors.Length > 0)
