@@ -139,6 +139,8 @@ public class LevelLoader : MonoBehaviour
             }
         }
 
+        levelsObj[levelsObj.Count-1].Unlock();
+
         parentRect.offsetMax = new Vector2(parentRect.offsetMax.x, parentRect.offsetMax.y + 680);
     }
 

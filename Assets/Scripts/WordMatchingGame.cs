@@ -152,12 +152,8 @@ public class WordMatchingGame : MonoBehaviour
         {
             gameManager.levelOpened++;
 
-            gameManager.WinInLevel(50);
+            gameManager.WinInLevel(25);
         }
-
-
-
-
 
 
         RestartGame();

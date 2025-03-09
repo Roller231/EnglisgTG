@@ -810,6 +810,7 @@ MonoBehaviour:
   word4ru: 
   word5en: 
   word5ru: 
+  type_level: 0
   color: {r: 1, g: 1, b: 1, a: 1}
   imagesPoints:
   - {fileID: 8072697426264307892}
@@ -822,7 +823,6 @@ MonoBehaviour:
   - {fileID: 5163956416521731832}
   imagesLocker: {fileID: 6318060561265842810}
   imageButton: {fileID: 8234036835687666264}
-  type_level: 0
   number_level_text: {fileID: 1228880919901050103}
 --- !u!114 &-8843218822573135461
 MonoBehaviour:
